@@ -22,6 +22,8 @@ import java.sql.DriverManager;
 @EnableWebMvc
 public class SpringConfig implements WebMvcConfigurer {
 
+    //git_test
+
     private final ApplicationContext applicationContext;
 
     @Autowired

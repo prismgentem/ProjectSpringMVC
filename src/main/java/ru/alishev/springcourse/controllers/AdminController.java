@@ -26,7 +26,7 @@ public class AdminController {
 
     @PatchMapping("/add")
     public String makeAdmin(@ModelAttribute("person") Person person){
-        System.out.println(person.getId());
+        System.out.println(person.getUserId());
         return "redirect:/people";
     }
 

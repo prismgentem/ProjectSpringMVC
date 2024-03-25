@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.alishev.springcourse.dao.BookDAO;
 import ru.alishev.springcourse.dao.PersonDAO;
 import ru.alishev.springcourse.models.Person;
 import ru.alishev.springcourse.util.PersonValidator;
@@ -34,6 +35,7 @@ public class PeopleController {
     public String show(@PathVariable("user_id") int userId, Model model){
         //получим одного чедовека из DAO и передадим на отображение в представление
         model.addAttribute("person", personDAO.show(userId));
+        model.addAttribute("books", personDAO.getBooksByPersonId(userId));
         return "people/show";
     }
 

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.alishev.springcourse.models.Book;
 import ru.alishev.springcourse.models.Person;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class PersonDAO {
         return jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
     }
 
-    public Optional<Person> show(String fullName) {
+    public Optional<Person> getPersonByFullName(String fullName) {
         return jdbcTemplate.query("SELECT * FROM Person WHERE full_name=?", new Object[]{fullName},
                 new BeanPropertyRowMapper<>(Person.class)).stream().findAny();
     }
@@ -44,5 +45,9 @@ public class PersonDAO {
     public void delete(int userId){
         //people.removeIf(person -> person.getId() == id);
         jdbcTemplate.update("DELETE FROM Person WHERE user_id=?", userId);
+    }
+
+    public List<Book> getBooksByPersonId(int userId){
+        return jdbcTemplate.query("SELECT * FROM Book WHERE user_id = ?", new Object[]{userId}, new BeanPropertyRowMapper<>(Book.class));
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.alishev.springcourse.models.Book;
+import ru.alishev.springcourse.models.Person;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,5 +43,18 @@ public class BookDAO {
     public void delete(int bookId){
         //people.removeIf(person -> person.getId() == id);
         jdbcTemplate.update("DELETE FROM Book WHERE book_id=?", bookId);
+    }
+
+    public Optional<Person> getBookOwner(int bookId){
+        return jdbcTemplate.query("SELECT Person.* FROM Book JOIN Person ON Book.user_id = Person.user_id " +
+                "WHERE Book.book_id = ?", new Object[]{bookId}, new BeanPropertyRowMapper<>(Person.class)).stream().findAny();
+    }
+
+    public void release(int bookId){
+        jdbcTemplate.update("UPDATE Book SET user_id=NULL WHERE book_id=?", bookId);
+    }
+
+    public void assign(int bookId, Person selectPerson){
+        jdbcTemplate.update("UPDATE Book SET user_id=? WHERE book_id=?", selectPerson.getUserId(), bookId);
     }
 }

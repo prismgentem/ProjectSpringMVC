@@ -1,21 +1,94 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Человек</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        p {
+            font-size: 18px;
+            margin: 0 0 10px 0;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 
-<p th:text="${person.getFullName() + ', ' + person.getYearOfBirth()}">VALUE</p>
-<p th:text="${'ID: ' + person.getUserId()}">VALUE</p>
+<div class="container">
+    <p th:text="${person.getFullName() + ', ' + person.getYearOfBirth()}"></p>
+    <!--<p th:text="${'ID: ' + person.getUserId()}"></p>-->
 
-<form th:method="GET" th:action="@{/people/{user_id}/edit(user_id=${person.getUserId()})}">
-    <input type="submit" value="Редактировать"/>
-</form>
+    <div th:if="${books.isEmpty()}">
+        <p>У человека нет книг.</p>
+        <hr/>
+    </div>
 
-<form th:method="DELETE" th:action="@{/people/{user_id}(user_id=${person.getUserId()})}">
-    <input type="submit" value="Удалить"/>
-</form>
+    <div th:if="${!books.isEmpty()}">
+        <hr/>
+        <p>Книги:</p>
+        <br/>
+        <table>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}"></td>
+            </tr>
+        </table>
+        <hr/>
+    </div>
+
+    <form th:method="GET" th:action="@{/people/{user_id}/edit(user_id=${person.getUserId()})}">
+        <input type="submit" value="Редактировать"/>
+    </form>
+
+    <form th:method="DELETE" th:action="@{/people/{user_id}(user_id=${person.getUserId()})}">
+        <input type="submit" value="Удалить"/>
+    </form>
+</div>
 
 </body>
 </html>

@@ -7,17 +7,23 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.alishev.springcourse.dao.BookDAO;
+import ru.alishev.springcourse.dao.PersonDAO;
 import ru.alishev.springcourse.models.Book;
+import ru.alishev.springcourse.models.Person;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/books")
 public class BooksController {
 
     private final BookDAO bookDAO;
+    private final PersonDAO personDAO;
 
     @Autowired
-    public BooksController(BookDAO bookDAO) {
+    public BooksController(BookDAO bookDAO, PersonDAO personDAO) {
         this.bookDAO = bookDAO;
+        this.personDAO = personDAO;
     }
 
     @GetMapping
@@ -27,8 +33,15 @@ public class BooksController {
     }
 
     @GetMapping("/{book_id}")
-    public String show(@PathVariable("book_id") int bookId, Model model){
+    public String show(@PathVariable("book_id") int bookId, Model model, @ModelAttribute("person") Person person){
         model.addAttribute("book", bookDAO.show(bookId));
+
+        Optional<Person> bookOwner = bookDAO.getBookOwner(bookId);
+
+        if(bookOwner.isPresent())
+            model.addAttribute("owner", bookOwner.get());
+        else model.addAttribute("people", personDAO.index());
+
         return "books/show";
     }
     @GetMapping("/new")
@@ -69,5 +82,17 @@ public class BooksController {
     public String delete(@PathVariable("book_id") int bookId){
         bookDAO.delete(bookId);
         return "redirect:/books";
+    }
+
+    @PatchMapping("/{book_id}/release")
+    public String release(@PathVariable("book_id") int bookId){
+        bookDAO.release(bookId);
+        return "redirect:/books/" + bookId;
+    }
+
+    @PatchMapping("/{book_id}/assign")
+    public String assign(@PathVariable("book_id") int bookId, @ModelAttribute("person") Person selectPErson){
+        bookDAO.assign(bookId, selectPErson);
+        return "redirect:/books/" + bookId;
     }
 }

@@ -1,53 +1,81 @@
 package ru.alishev.springcourse.dao;
 
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.alishev.springcourse.models.Book;
 import ru.alishev.springcourse.models.Person;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class PersonDAO {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public PersonDAO(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
+    public PersonDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
+    @Transactional(readOnly = true)
     public List<Person> index(){
-        return jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("select p from Person p", Person.class).getResultList();
     }
-
+//похорошему бы переписать
+    @Transactional
     public Optional<Person> getPersonByFullName(String fullName) {
-        return jdbcTemplate.query("SELECT * FROM Person WHERE full_name=?", new Object[]{fullName},
-                new BeanPropertyRowMapper<>(Person.class)).stream().findAny();
+        Session session = sessionFactory.getCurrentSession();
+        return session.byNaturalId(Person.class).using("full_name", fullName).loadOptional();
     }
 
+    @Transactional
     public Person show(int userId){
-        return jdbcTemplate.query("SELECT * FROM Person WHERE user_id=?", new Object[]{userId}, new BeanPropertyRowMapper<>(Person.class))
-                .stream().findAny().orElse(null);
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Person.class, userId);
     }
 
+    @Transactional
     public void save(Person person){
-        jdbcTemplate.update("INSERT INTO Person(full_name, year_of_birth) VALUES(?, ?)", person.getFullName(), person.getYearOfBirth());
+        Session session = sessionFactory.getCurrentSession();
+        session.save(person);
     }
 
+    @Transactional
     public void update(int userId, Person personUpdate){
-        jdbcTemplate.update("UPDATE Person SET full_name=?, year_of_birth=? WHERE user_id=?", personUpdate.getFullName(), personUpdate.getYearOfBirth(), userId);
+        Session session = sessionFactory.getCurrentSession();
+
+        Person personToBeUpdated = session.get(Person.class, userId);
+        personToBeUpdated.setFullName(personUpdate.getFullName());
+        personToBeUpdated.setYearOfBirth(personUpdate.getYearOfBirth());
     }
 
+    @Transactional
     public void delete(int userId){
-        //people.removeIf(person -> person.getId() == id);
-        jdbcTemplate.update("DELETE FROM Person WHERE user_id=?", userId);
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(session.get(Person.class, userId));
     }
 
+//подумать и сделать
+    @Transactional
     public List<Book> getBooksByPersonId(int userId){
-        return jdbcTemplate.query("SELECT * FROM Book WHERE user_id = ?", new Object[]{userId}, new BeanPropertyRowMapper<>(Book.class));
+        Session session = sessionFactory.getCurrentSession();
+        Person person = session.get(Person.class, userId);
+
+        Hibernate.initialize(person.getBooks());
+
+        if(person.getBooks() == null){
+            return Collections.emptyList();
+        }
+        return person.getBooks();
     }
 }

@@ -20,3 +20,4 @@
 - HTML
 - CSS
 - Thymeleaf (шаблонизатор)
+- Hibernate

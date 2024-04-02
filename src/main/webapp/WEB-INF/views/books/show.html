@@ -57,6 +57,21 @@
         label {
             margin-right: 10px;
         }
+
+        /* Новый стиль для кнопки "На главную" */
+        .home-btn {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: #495057;
+        }
     </style>
 </head>
 
@@ -90,6 +105,11 @@
 
     <form th:method="DELETE" th:action="@{/books/{book_id}/edit(book_id=${book.getBookId()})}">
         <input type="submit" value="Удалить"/>
+    </form>
+
+    <!-- Кнопка "На главную" -->
+    <form action="/">
+        <button class="home-btn">На главную</button>
     </form>
 </div>
 

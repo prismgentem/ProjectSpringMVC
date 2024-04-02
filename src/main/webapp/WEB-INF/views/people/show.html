@@ -56,6 +56,19 @@
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+        /* Новый стиль для кнопки "На главную" */
+        .home-btn {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .home-btn:hover {
+            background-color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +100,11 @@
 
     <form th:method="DELETE" th:action="@{/people/{user_id}(user_id=${person.getUserId()})}">
         <input type="submit" value="Удалить"/>
+    </form>
+
+    <!-- Кнопка "На главную" -->
+    <form action="/">
+        <button class="home-btn">На главную</button>
     </form>
 </div>
 
